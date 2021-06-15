@@ -12,9 +12,9 @@ namespace Store;
  */
 class Rack
 {
-    private array $items;
     protected int $itemsCapacity;
     protected int $itemsTotal = 0;
+    private array $items;
 
     public function __construct(array $items, int $itemsCapacity)
     {
@@ -37,6 +37,24 @@ class Rack
     }
 
     /**
+     * checks whether the rack has reached its max. capacity of items
+     * @return bool
+     */
+    private function hasRackReachedCapacity()
+    {
+        $currentItemsTotal = count($this->getItems());
+        return $currentItemsTotal >= $this->itemsCapacity;
+    }
+
+    /**
+     * @return array
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /**
      * fetches an item and updates items list by minus 1
      * @param $itemIndex
      * @return CabinetItem|null
@@ -50,24 +68,6 @@ class Rack
             return $item;
         }
         return null;
-    }
-
-    /**
-     * @return array
-     */
-    public function getItems(): array
-    {
-        return $this->items;
-    }
-
-    /**
-     * checks whether the rack has reached its max. capacity of items
-     * @return bool
-     */
-    private function hasRackReachedCapacity()
-    {
-        $currentItemsTotal = count($this->getItems());
-        return $currentItemsTotal >= $this->itemsCapacity;
     }
 
 

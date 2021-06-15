@@ -31,12 +31,31 @@ class Cabinet
     }
 
     /**
-     * checks if cabinet has reached its max. capacity or not
-     * @return bool
+     * fetches an item from specific rack and item from that rack
+     * @param int $rackIndex
+     * @param int $itemIndex
+     * @return CabinetItem|null
      */
-    public function hasCabinetReachedCapacity()
+    public function fetchItem(int $rackIndex, int $itemIndex)
     {
-        return $this->capacityStatus === static::FULL_CAPACITY_USED;
+        $rack = $this->getRackByIndex($rackIndex);
+        $item = $rack->fetchItem($itemIndex);
+        if ($item) {
+            $this->setCabinetItemsCapacity();
+            Support::fetchItemMessage("Fetching item: " . $item->getLabel() . "<br>");
+        }
+        Support::fetchItemMessage("Fetching item: <span style='background-color: #4ca90e;color:white;font-weight: bolder'>NOT FOUND</span><br>");
+        return $item;
+    }
+
+    /**
+     * returns a rack object instance provided from the racks array
+     * @param int $rackIndex
+     * @return Rack
+     */
+    public function getRackByIndex(int $rackIndex): Rack
+    {
+        return $this->racks[$rackIndex];
     }
 
     /**
@@ -69,21 +88,16 @@ class Cabinet
     }
 
     /**
-     * fetches an item from specific rack and item from that rack
-     * @param int $rackIndex
-     * @param int $itemIndex
-     * @return CabinetItem|null
+     * helper function to map through all racks' items
+     * @return array
      */
-    public function fetchItem(int $rackIndex, int $itemIndex)
+    public function mapAllRacksItems(): array
     {
-        $rack = $this->getRackByIndex($rackIndex);
-        $item = $rack->fetchItem($itemIndex);
-        if ($item) {
-            $this->setCabinetItemsCapacity();
-            Support::fetchItemMessage("Fetching item: " . $item->getLabel() . "<br>");
-        }
-        Support::fetchItemMessage("Fetching item: <span style='background-color: #4ca90e;color:white;font-weight: bolder'>NOT FOUND</span><br>");
-        return $item;
+        return array_map(
+            function (Rack $item) {
+                return $item->getItems();
+            }, $this->racks
+        );
     }
 
     /**
@@ -102,16 +116,6 @@ class Cabinet
     }
 
     /**
-     * returns a rack object instance provided from the racks array
-     * @param int $rackIndex
-     * @return Rack
-     */
-    public function getRackByIndex(int $rackIndex): Rack
-    {
-        return $this->racks[$rackIndex];
-    }
-
-    /**
      * checks if cabinet has reached capacity, if so, it will throw an error to the user
      * @throws \Exception
      */
@@ -123,16 +127,12 @@ class Cabinet
     }
 
     /**
-     * helper function to map through all racks' items
-     * @return array
+     * checks if cabinet has reached its max. capacity or not
+     * @return bool
      */
-    public function mapAllRacksItems(): array
+    public function hasCabinetReachedCapacity()
     {
-        return array_map(
-            function (Rack $item) {
-                return $item->getItems();
-            }, $this->racks
-        );
+        return $this->capacityStatus === static::FULL_CAPACITY_USED;
     }
 
     /**
